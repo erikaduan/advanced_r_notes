@@ -1,7 +1,7 @@
 Chapter 2: Names and Values
 ================
 Erika Duan
-2020-06-10
+2020-06-20
 
   - [Chapter goals](#chapter-goals)
   - [Binding basics](#binding-basics)
@@ -50,16 +50,16 @@ d <- 1:10
 # (c) is a name that points to the name (b) - therefore (c) should point to what (a) and (b) are point to
 # (d) is a value that is pointing to a new object in memory i.e. a second object c(1:10)   
 
-# obj_addr(a)
+obj_addr(a)
 #> [1] "0x198432d8f78"
 
-# obj_addr(b)
+obj_addr(b)
 #> [1] "0x198432d8f78"
 
-# obj_addr(c)
+obj_addr(c)
 #> [1] "0x198432d8f78"
 
-# obj_addr(d)
+obj_addr(d)
 #> [1] "0x1983d4afcb8"  
 
 #-----what if the object assignment occurs via a function-----
@@ -70,7 +70,7 @@ object_funs <- function(object) {
 e <- object_funs(object = a)
 # (e) is a name that points to the object assigned to (a)
 
-# obj_addr(e)  
+obj_addr(e)  
 #> [1] "0x198432d8f78"  
 ```
 
@@ -80,19 +80,19 @@ e <- object_funs(object = a)
 # maybe a separate new object is generated each time the function runs? 
 # it turns out that they are all the same object!
 
-# obj_addr(mean) 
+obj_addr(mean) 
 #> [1] "0x1983dd792b0"
 
-# obj_addr(base::mean) # same thing as mean 
+obj_addr(base::mean) # same thing as mean 
 #> [1] "0x1983dd792b0"
 
-# obj_addr(get("mean")) # get() returns the value of a named object  
+obj_addr(get("mean")) # get() returns the value of a named object  
 #> [1] "0x1983dd792b0"  
 
-# obj_addr(evalq(mean))  
+obj_addr(evalq(mean))  
 #> [1] "0x1983dd792b0"
 
-# obj_addr(match.fun("mean")) 
+obj_addr(match.fun("mean")) 
 #> [1] "0x1983dd792b0"
 
 #-----what happens if we bind mean(x) to a value-----
@@ -103,13 +103,13 @@ c <- a
 # (a) and (c) will point to the same object in memory
 # (b) will point to a different object in memory 
 
-# obj_addr(a)
+obj_addr(a)
 #> [1] "0x19842f4ca30"  
 
-# obj_addr(b) 
+obj_addr(b) 
 #> [1] "0x19842eb3130"  
 
-# obj_addr(c) 
+obj_addr(c) 
 #> [1] "0x19842f4ca30"  
 ```
 
@@ -145,6 +145,29 @@ to the new object instead.
 
 <img src="../01_figures/02_names-to-values-2.jpg" width="50%" style="display: block; margin: auto;" />
 
+``` r
+#-----testing tracemem()-----  
+x <- c(1L, 2L, 3L)
+
+tracemem(x)
+#> [1] "<0000020269FDA4C0>"
+
+y <- x
+y[3] <- 4L 
+
+#> tracemem[0x0000020269fda4c0 -> 0x0000020267708360]:      
+
+# y was previously bound to the same object as x
+# the object that y was bound to was then modified 
+# R stores the modified object as a new object in memory, which y is now bound to   
+
+y[3] <- 6L
+
+#> tracemem[0x0000020267708360 -> 0x0000020267f3a860]:     
+
+untracemem(x)
+```
+
 A list superficially appears to stores a collection (i.e. list) of
 values/objects of differing lengths. It actually stores a collection of
 references (i.e. an object in memory itself) pointing to values/objects
@@ -161,7 +184,7 @@ bound to are not copied).
 list_1 <- list(1, 2, 3)
 list_2 <- list_1
 
-# ref(list_1, list_2)  
+ref(list_1, list_2)  
 #> o [1:0x20269f86a30] <list> 
 #> +-[2:0x20267266668] <dbl> 
 #> +-[3:0x20267266630] <dbl> 
@@ -172,7 +195,7 @@ list_2 <- list_1
 
 list_2[[3]] <- 10
 
-# ref(list_1, list_2)
+ref(list_1, list_2)
 
 #> o [1:0x20269f86a30] <list> 
 #> +-[2:0x20267266668] <dbl> 
@@ -200,14 +223,14 @@ df_1 <- data.frame(c(1, 2, 3),
                    c(4, 5, 6))
 df_2 <- df_1
 
-# ref(df_1, df_2)  
+ref(df_1, df_2)  
 #> o [1:0x20269eb2840] <df[,2]> 
 #> +-c.1..2..3. = [2:0x2026c4ee388] <dbl> 
 #> \-c.4..5..6. = [3:0x2026c4ee298] <dbl>  
 
 df_2[, 2] <- df_2[, 2] - 2
  
-# ref(df_1, df_2)   
+ref(df_1, df_2)   
 #> o [1:0x20269eb2840] <df[,2]>    
 #> +-c.1..2..3. = [2:0x2026c4ee388] <dbl>    
 #> \-c.4..5..6. = [3:0x2026c4ee298] <dbl>    
@@ -220,7 +243,7 @@ df_2[, 2] <- df_2[, 2] - 2
 df_3 <- df_1
 df_3[1, ] <- df_3[1, ] * 1
 
-# ref(df_1, df_3)
+ref(df_1, df_3)
 #> o [1:0x20269eb2840] <df[,2]>    
 #> +-c.1..2..3. = [2:0x2026c4ee388] <dbl>   
 #> \-c.4..5..6. = [3:0x2026c4ee298] <dbl>   
@@ -243,7 +266,7 @@ a unique string.
 #-----examining character vector referencing------
 x <- c("an", "ant", "ate", "an", "ant", "aye?")
 
-# ref(x, character = T) 
+ref(x, character = T) 
 #> o [1:0x2026d27f020] <chr> 
 #> +-[2:0x202606756f8] <string: "an"> 
 #> +-[3:0x20268c9d0e0] <string: "ant"> 
@@ -261,21 +284,24 @@ x <- c("an", "ant", "ate", "an", "ant", "aye?")
 #-----exercise 2.3.6.2-----  
 x <- c(1L, 2L, 3L)
 
-# tracemem(x)
+tracemem(x)
 
 x[[3]] <- 4 # creates a new copy of x as double type, then modified x[[3]] with double == 4
-
-# untracemem(x) 
+ 
 #> tracemem[0x000002026871ca60 -> 0x0000020268955060]: 
 #> tracemem[0x0000020268955060 -> 0x000002026cbf2788]: 
 
+untracemem(x)
+
 y <- c(1L, 2L, 3L)
-# tracemem(y)
+
+tracemem(y)
 
 y[[3]] <- 4L 
 
-# untracemem(y) 
 #> tracemem[0x0000020269ea9460 -> 0x0000020269eacaa0]:   
+
+untracemem(y) 
 
 #-----exercise 2.3.6.3-----   
 a <- 1:10
@@ -286,7 +312,7 @@ c <- list(b, a, 1:10)
 # b is a separate list that points back twice to a
 # c is a separate list that points back to b (a, a) and a, and a new object in memory
 
-# ref(a, b, c)
+ref(a, b, c)
 #> [1:0x20267d504f8] <int> # a is bound to a new object in memory (series of integers)
   
 #> o [2:0x20269f9f160] <list> 
@@ -301,21 +327,21 @@ c <- list(b, a, 1:10)
 #-----exercise 2.3.6.4-----    
 z <- list(1:10)
 
-# ref(z)
+ref(z)
 #> o [1:0x202673fb928] <list> 
 #> \-[2:0x20266446110] <int> 
 
-# tracemem(z)
+tracemem(z)
 
 z[[2]] <- z # adds a new vector i.e. z <- c(1:10) in the original list 
 #> tracemem[0x00000202673fb928 -> 0x00000202683fc6c8]: 
 
-# untracemem(z)
+untracemem(z)
 
 # z is modified so a new list reference is produced  
 # the second value in list z points to the original object in memory (integer)
  
-# ref(z)
+ref(z)  
  
 #> o [1:0x20269ea5160] <list> # new list reference 
 #> +-[2:0x20266446110] <int> 
@@ -331,29 +357,29 @@ object. Note that `obj_size(x)` + `obj_size(y)` will only equal
 
 ``` r
 #-----calculating how much memory an object takes-----
-# dim(iris)
+dim(iris)
 #> [1] 150   5    
 
-# obj_size(iris)
+obj_size(iris)
 #> 7,688 B 
 
 #-----list sizes are smaller when referencing the same values-----
 x <- runif(1e6) # 1 million random values
 
-# obj_size(x)
+obj_size(x)
 #> 8,000,048 B
 
 list_x <- list(x, x, x)
-# obj_size(list_x)
+obj_size(list_x)
 #> 8,000,128 B # only 80 B larger than x
 
-# obj_size(list(NULL, NULL, NULL))
+obj_size(list(NULL, NULL, NULL))
 #> 80 B  
 
-# obj_size(list(NA, NA, NA))
+obj_size(list(NA, NA, NA))
 #> 248 B
 
-# obj_size(list(1, 1, 1))
+obj_size(list(1, 1, 1))
 #> 248 B 
 
 # note that obj_size(list(NA, NA, NA)) produces a slightly larger object 
@@ -363,10 +389,10 @@ list_x <- list(x, x, x)
 
 ``` r
 #-----character vectors are smaller when referencing the same strings-----
-# obj_size("banana")
+obj_size("banana")
 #> 112 B
 
-# obj_size(c(rep("banana"), 10000))
+obj_size(c(rep("banana"), 10000))
 #> 176 B
 ```
 
@@ -376,15 +402,15 @@ numbers are stored).
 
 ``` r
 #-----ALTREP in R 3.5.0 and later versions-----
-# obj_size(1:5)
+obj_size(1:5)
 #> 680 B
 
-# obj_size(1:50000)
+obj_size(1:50000)
 #> 680 B 
 
-# note that c(1:50000) does not work because it assigns a name to each individual value  
+# note that obj_size(c(1:50000)) does not work because it assigns a name to each individual value  
 
-# obj_size(c(1:50000))
+obj_size(c(1:50000))
 #> 200,048 B
 ```
 
@@ -394,52 +420,46 @@ y <- rep(list(runif(1000)), 100)
 
 # y is a list of 100 identical values (each containing a numerical vector of n = 1000)
 
-# object.size(y)
+object.size(y)
 #> 8005648 bytes
-# obj_size(y)
+obj_size(y)
 #> 80,896 B
 
 # object.size(y) >> obj_size(y) because it does not detect if elements of a list are shared
 
-x <- rep("cat", 100)
-# object.size(x)
+x <- rep("cat", 100) # x is a vector as opposed to a list  
+object.size(x)
 #> 904 bytes
 
-# obj_size(x)
+obj_size(x)
 #> 904 B 
 
-# otherwise object.size(y) == obj_size(y)
+# i.e. otherwise object.size(y) == obj_size(y)
 
 #-----exercise 2.4.1.3-----  
 a <- runif(1e6)
-# obj_size(a)
+obj_size(a)
 #> 8,000,048 B 
 
 b <- list(a, a)
-# obj_size(b) # similar size to but slightly larger than a
+obj_size(b) # similar size to but slightly larger than a
 #> 8,000,112 B 
 
-# obj_size(a, b) # identical size to b
+obj_size(a, b) # identical size to b
 #> 8,000,112 B
 
 b[[1]][[1]] <- 10
-# obj_size(b) 
+obj_size(b) 
 #> 16,000,160 B
 
-# I thought it would be identical in size to original b 
-# but two different lists have now been created because of copy-on-modify!    
-
-# obj_size(a, b) # identical to b because a == b[[2]]
+# obj_size(a, b) # because b[[1]] is now different to a 
 #> 16,000,160 B
 
-b[[2]][[1]] <- 10 
-# obj_size(b)
+b[[2]][[1]] <- 10 # because b[[1]] and b[[2]] are still different to each other
+obj_size(b)
 #> 16,000,160 B
 
-# I thought it would be back to 8,000,112 B but because of copy-on-modify, 
-# a new object (numerical vector) has now been created in a new space!  
-
-# obj_size(a, b) 
+obj_size(a, b) # because a, b[[1]] and b[[2]] are all different to each other  
 #> 24,000,208 B
 ```
 
@@ -453,7 +473,7 @@ optimisation.
 #-----exploring objects with a single binding-----  
 v <- c(1, 2, 3)
 
-# tracemem(v)  
+tracemem(v)  
 #> [1] "<000002026FB6D550>" 
 
 v[3] <- 10   
@@ -473,7 +493,7 @@ object oriented-programming system).
 e1 <- rlang::env(a = 1, b = 2, c = 3)
 e2 <- e1
 
-# ref(e1, e2)
+ref(e1, e2)  
 #> o [1:0x2026dc7a2c8] <env> 
 #> +-a = [2:0x202676bfcf8] <dbl> 
 #> +-b = [3:0x202676bfd30] <dbl> 
@@ -485,7 +505,7 @@ e1$c <- 10
 
 # modifying e1$c modifies the object that c is now pointing to 
 
-# e2$c
+e2$c
 #> [1] 10
 
 # therefore e2$c also changes (it is now pointing to the same new object)
@@ -493,24 +513,24 @@ e1$c <- 10
 
 ``` r
 #-----exercise 2.5.3.1-----  
-# why is a circular loop (where empty lists keep getting added to x) not created?
+# why is a circular loop (i.e. where empty lists keep getting added to x) not created?
 x <- list()
 
-# obj_addr(x)
+obj_addr(x)
 #> [1] "0x25a8bcfd368"
 
-# tracemem(x)
+tracemem(x)
 
 x[[1]] <- x 
 
 #> tracemem[0x0000025a8bcfd368 -> 0x0000025a91283258]: 
 
-# untracemem(x)  
+untracemem(x)  
 
 # a copy of the original object x was created, modified and x is newly assigned to a reference
 # the original object x still remains as an object in memory  
 
-# ref(x)
+ref(x)
 
 #> o [1:0x25a917c73c0] <list> # copied object has new memory address
 #> \-o [2:0x25a8bcfd368] <list> # list element separately points to original object  
@@ -518,14 +538,14 @@ x[[1]] <- x
 #-----exercise 2.5.3.2-----
 x <- data.frame(matrix(runif(1), ncol = 1))
 
-# tracemem(x)
+tracemem(x)
 #> [1] "<000001F68F724140>"
 
 for (i in seq_along(x)) {
   x[[i]] <- x[[i]] + 1
 }
 
-# untracemem(x)
+untracemem(x)
 
 #> tracemem[0x000001f68f724140 -> 0x000001f68f8e9750]: 
 #> tracemem[0x000001f68f8e9750 -> 0x000001f68f8e9600]: [[<-.data.frame [[<- 
@@ -534,7 +554,7 @@ for (i in seq_along(x)) {
 #> tracemem[0x000001f68f8e9478 -> 0x000001f68f987e10]: as.list.data.frame as.list vapply which .rs.frameCols.rs.toDataFrame <Anonymous>   
 
 #-----exercise 2.5.3.3-----  
-# Error in tracemem(e1) : 
+# error in tracemem(e1) : 
 #   'tracemem' is not useful for promise and environment objects 
 #    because environments are not duplicated object!   
 ```
@@ -548,6 +568,6 @@ deleting valueless objects in memory belongs to the garbage collector.
 
 <img src="../01_figures/02_names-to-values-6.jpg" width="60%" style="display: block; margin: auto;" />
 
-Note that the garbage collector (GC) runs automatically whenever R needs
-more memory to create a new object, and that there is no need to
-manually call `gc()` yourself.
+Note that the garbage collector runs automatically whenever R needs more
+memory to create a new object, and that there is no need to manually
+call `gc()` yourself.
