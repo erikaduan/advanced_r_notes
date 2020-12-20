@@ -1,0 +1,293 @@
+---
+title: "Chapter 4: Subsetting"
+author: "Erika Duan"
+date: "`r Sys.Date()`"
+output: 
+  github_document:
+    toc: true
+---  
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = 'hide')
+```
+
+```{r, message = FALSE, warning = FALSE}
+#-----load R libraries-----   
+if (!require(pacman)) install.packages("pacman")
+p_load(tidyverse)  
+```
+
+
+# Chapter goals  
+
+Understanding how subsetting is performed in R helps you to:   
+
++ Perform complex operations in a succinct and fast manner.   
++ Understand how atomic vectors can be subsetted in 6 ways, and how subsetting operations differ for lists, matrices and data frames.   
++ Use subassignment (combine subsetting and assignment to modify parts of an object).    
+
+
+# Selecting multiple elements  
+
+
+## Selecting atomic vectors  
+
+There are 6 different ways you can subset atomic vectors.  
+
++ Using positive integers (subset via position of element in vector).    
++ Using negative integers (subset by excluding via position of element in vector).     
++ Using logical vectors (subset by selecting elements where the corresponding logical value is `TRUE`).     
++ Using `[]` (subset everything and returns the original vector).       
++ Using '[0]' (subset nothing and returns a zero length vector).        
++ Using character vectors if the vector is named via `setNames` (subset elements with matching names to character vector).    
+
+```{r}
+#-----subset atomic vector using positive integers-----  
+# positive integers represent the position of the value in the vector (from the left to right)    
+
+string <- c("apple", "bear", "cactus", "dog", "elephant")  
+
+string[c(3, 1)] 
+#> [1] "cactus" "apple" 
+
+string[c(1, 1)] 
+#> [1] "apple" "apple"  
+```
+
+```{r}
+#-----subset atomic vector using negative integers-----
+# negative integers exclude elements by position
+
+string <- c("apple", "bear", "cactus", "dog", "elephant")  
+
+string[-c(3, 1)]
+#> [1] "bear"     "dog"      "elephant" 
+
+string[c(-3, -1)]
+#> [1] "bear"     "dog"      "elephant"
+
+# note that x[-c(1, 2)] == x[c(-1, -2)]  
+
+# string[c(1, -3)]
+#> Show in New WindowClear OutputExpand/Collapse Output
+#> Error in string[c(1, -3)] : 
+#>   only 0's may be mixed with negative subscripts  
+
+# note that you cannot mix positive and negative integers together when subsetting  
+```
+
+```{r}
+#-----subset atomic vector using logical vectors-----  
+# most popular method as we can subset via evaluated conditions  
+
+string <- c(1.5, 2.3, 3.0, 4.5, 5.7)  
+
+string[c(F, F, T)] # shorter lengths are not recycled
+#> [1] 3  
+
+string > 3 # evaluate a condition  
+#> [1] FALSE FALSE FALSE  TRUE  TRUE
+
+string[string > 3] # returns elements where condition == TRUE 
+#> [1] 4.5 5.7  
+```
+
+```{r}
+#-----subset atomic vector using []-----  
+string <- c(1.5, 2.3, 3.0, 4.5, 5.7)  
+
+string[]
+#> [1] 1.5 2.3 3.0 4.5 5.7  
+```
+
+```{r}
+#-----subset atomic vector using zero-----  
+string <- c(1.5, 2.3, 3.0, 4.5, 5.7)   
+
+string[0]
+#> numeric(0)  
+```
+
+```{r}
+#-----subset atomic via vector name-----   
+string <- c(1.5, 2.3, 3.0, 4.5, 5.7)  
+
+string <- setNames(string, letters[1:5])
+
+string[c("b", "d")]
+#>   b   d 
+#> 2.3 4.5 
+
+string[c("bb", "d")] # vector names and character vectors must be matched exactly  
+#> <NA>    d 
+#>   NA  4.5 
+```
+
+**Note:** Factors cannot be subsetted using character vectors (i.e. `NA` is returned). Subsetting factors using positive integers will return elements via the pposition of the element in the vector per usual.    
+
+```{r}
+#-----do not try to subset factor levels using character vectors-----  
+string <- c("yes", "yes", "no", "yes", "no")   
+string <- factor(string, levels = c("yes", "no"))
+
+string["yes"]
+#> [1] <NA>
+#> Levels: yes no 
+
+# positive and negative integer subsetting of factors works as per normal
+
+string[3]
+#> [1] no
+#> Levels: yes no
+```
+
+
+## Selecting lists   
+
+You can select different components of a list using different approaches.  
+
++ Using `[]` to subset the entire list.  
++ Using `[[]]` or `[]$` to subset elements from a list.  
+
+```{r}
+#-----subset a list using []-----
+list_a <- list(list_1 = c("apples", "bread", "milk", "eggs", "chocolate chips"),
+               list_2 = c("keys", "wallet", "phone", "20.00"))
+
+list_a[]
+#> $list_1
+#> [1] "apples"          "bread"           "milk"            "eggs"            "chocolate chips"
+
+#> $list_2
+#> [1] "keys"   "wallet" "phone"  "20.00"  
+
+list_a[1]
+#> $list_1
+#> [1] "apples"          "bread"           "milk"            "eggs"            "chocolate chips"
+
+class(list_a[1])
+#> [1] "list"  
+
+#-----subset elements from a list using [[]] or []$-----   
+list_a[[1]]
+#> [1] "apples"          "bread"           "milk"            "eggs"            "chocolate chips"  
+
+class(list_a[[1]])
+#>[1] "character"  
+
+class(list_a$list_1) 
+#> [1] "character"  
+```
+
+
+## Selecting matrices and arrays    
+
+Higher dimension structures like matrices and arrays can be subsetted in 4 ways.    
+
++ Using multiple vectors (1D index for each dimension, separated by a comma).   
++ Using a single vector (i.e. by element position, reading from left to right and top to bottom).    
++ Using a matrix (i.e. use a 2 column matrix to subset a matrix and a 3 column matrix to subset a 3D array etc.).  
++ Using `[]` (subset everything and returns the original matrix/ array with row and column structure preserved).       
+
+```{r}
+#-----subset matrix using multiple vectors-----   
+mat_a <- matrix(1:12, nrow = 4)
+
+dimnames(mat_a) <- list(row_names = c("ID1", "ID2", "ID3", "ID4"),
+                        col_names = c("A", "B", "C"))
+
+mat_a
+#>          col_names
+#> row_names A B  C
+#>       ID1 1 5  9
+#>       ID2 2 6 10
+#>       ID3 3 7 11
+#>       ID4 4 8 12
+
+mat_a[1:2, 2:3] # first two rows by second and third column
+#>          col_names
+#> row_names B  C
+#>       ID1 5  9
+#>       ID2 6 10 
+
+# you can subset using integers or logical vectors
+
+mat_a[c(T, T, F, F), 2:3] 
+#>          col_names
+#> row_names B  C
+#>       ID1 5  9
+#>       ID2 6 10 
+```
+
+```{r}
+#-----subset using a single vector-----  
+# subsets by element position  
+# not recommended as it does not make use of the 2D properties of matrices and arrays 
+
+mat_a <- matrix(1:12, nrow = 4)
+
+dimnames(mat_a) <- list(row_names = c("ID1", "ID2", "ID3", "ID4"),
+                        col_names = c("A", "B", "C"))   
+
+mat_a[c(1, 3)]
+#> [1] 1 3  
+
+# mat_a[c(1, 3)] is a single vector subset and should not be confused with mat_a[c(1, 3), ]
+
+mat_a[c(1, 3), ]
+#>          col_names
+#> row_names A B  C
+#>       ID1 1 5  9
+#>       ID3 3 7 11 
+```
+
+```{r}
+#-----subset using a matrix-----  
+mat_a <- matrix(1:12, nrow = 4)
+
+dimnames(mat_a) <- list(row_names = c("ID1", "ID2", "ID3", "ID4"),
+                        col_names = c("A", "B", "C"))     
+
+# create nx2 matrix where row = row position, column = column position of value n  
+
+mat_subset <- matrix(c(1, 1, 2, 2, 3, 3), byrow = T, ncol = 2)
+mat_subset
+#>      [,1] [,2]
+#> [1,]    1    1
+#> [2,]    2    2
+#> [3,]    3    3
+
+mat_a[mat_subset]  
+#> [1]  1  6 11  
+```
+
+**Note:** Subsetting by `[x]` also simplifies the result to the lowest possible dimension.   
+
+```{r}
+#-----subset via [] simplifies to lowest possible dimension-----  
+mat_a <- matrix(1:12, nrow = 4)
+
+dimnames(mat_a) <- list(row_names = c("ID1", "ID2", "ID3", "ID4"),
+                        col_names = c("A", "B", "C"))  
+
+class(mat_a[1:2, 1:2]) # returns a 2D matrix  
+#> [1] "matrix"   
+
+class(mat_a[1:2, 1]) # i.e. drops 1 dimension to return a 1D atomic vector  
+#> [1] "integer"  
+```
+
+
+## Selecting data frames and tibbles  
+
+```{r}
+
+```
+
+
+## Preserving dimensionality  
+
+```{r}
+
+```
+

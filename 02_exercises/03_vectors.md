@@ -1,7 +1,7 @@
 Chapter 3: Vectors
 ================
 Erika Duan
-2020-06-20
+2020-08-04
 
   - [Chapter goals](#chapter-goals)
   - [Vector types](#vector-types)
@@ -715,9 +715,9 @@ str(list_1)
 #>  $ doubles    : num [1:2] 2.3 5.9
 ```
 
-If given a combination of atomic vectors and lists, c() will coerce the
-vectors to lists before combining them. This also means that lists can
-be thought of as recursive vectors (i.e. a list can contain lists).
+If given a combination of atomic vectors and lists, `c()` will coerce
+the vectors to lists before combining them. This also means that lists
+can be thought of as recursive vectors (i.e. a list can contain lists).
 
 ``` r
 #-----combine lists-----
@@ -1034,12 +1034,12 @@ mat_1
 ```
 
     ##          col_names
-    ## row_names     gene1     gene2
-    ##   sample1  4.375771  7.531823
-    ##   sample2 10.552235  8.317460
-    ##   sample3  8.253400  3.957825
-    ##   sample4  9.053442 11.983167
-    ##   sample5 11.588703  3.327841
+    ## row_names     gene1    gene2
+    ##   sample1 22.353063 3.000711
+    ##   sample2  8.144342 1.741200
+    ##   sample3 29.340608 7.041497
+    ##   sample4 12.055899 1.183540
+    ##   sample5 18.987711 3.654186
 
 ``` r
 tibble_1 <- as_tibble(mat_1, rownames = "sample")
@@ -1050,11 +1050,11 @@ tibble_1 # rownames are included as a new variable
     ## # A tibble: 5 x 3
     ##   sample  gene1 gene2
     ##   <chr>   <dbl> <dbl>
-    ## 1 sample1  4.38  7.53
-    ## 2 sample2 10.6   8.32
-    ## 3 sample3  8.25  3.96
-    ## 4 sample4  9.05 12.0 
-    ## 5 sample5 11.6   3.33
+    ## 1 sample1 22.4   3.00
+    ## 2 sample2  8.14  1.74
+    ## 3 sample3 29.3   7.04
+    ## 4 sample4 12.1   1.18
+    ## 5 sample5 19.0   3.65
 
 # Subsetting
 

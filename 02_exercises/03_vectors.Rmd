@@ -665,7 +665,7 @@ str(list_1)
 #>  $ doubles    : num [1:2] 2.3 5.9
 ```
 
-If given a combination of atomic vectors and lists, c() will coerce the vectors to lists before combining them. This also means that lists can be thought of as recursive vectors (i.e. a list can contain lists).   
+If given a combination of atomic vectors and lists, `c()` will coerce the vectors to lists before combining them. This also means that lists can be thought of as recursive vectors (i.e. a list can contain lists).   
 
 ```{r}
 #-----combine lists-----
