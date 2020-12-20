@@ -11,4 +11,3 @@ I recommend reading [Advanced R Solutions](https://advanced-r-solutions.rbind.io
 3. [Subsetting](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/04_subsetting.md)  
 
 ![](https://github.com/erikaduan/Advanced-R-notes/blob/master/01_figures/advanced-R.jpg)  
-
