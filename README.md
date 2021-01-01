@@ -11,6 +11,7 @@ I recommend reading [Advanced R Solutions](https://advanced-r-solutions.rbind.io
 1. [Names and values](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/02_names-and-values.md)  
 2. [Vectors](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/03_vectors.md)  
 3. [Subsetting](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/04_subsetting.md)  
+4. [Control flow](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/05_control-flow.md)  
 
 # Advanced R Youtube lectures  
 

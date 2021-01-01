@@ -1,7 +1,7 @@
 Chapter 3: Vectors
 ================
 Erika Duan
-2020-12-22
+2020-12-30
 
   - [Chapter goals](#chapter-goals)
   - [Vector types](#vector-types)
@@ -33,7 +33,7 @@ p_load(tidyverse)
 
 # Chapter goals
 
-Understanding the properties and behaviours of vectors helps you to:
+Understanding the properties and behaviours of **vectors** helps you to:
 
   - Understand the difference between atomic vectors and lists.  
   - Understand how different object types (i.e. factors, dates,
@@ -1114,11 +1114,11 @@ dim(mat_1)
 
 |         |     gene1 |    gene2 |
 | ------- | --------: | -------: |
-| sample1 |  3.282617 | 3.381025 |
-| sample2 | 23.904538 | 7.376351 |
-| sample3 |  6.112106 | 8.891578 |
-| sample4 |  6.729298 | 5.694143 |
-| sample5 | 15.413555 | 7.760555 |
+| sample1 |  6.738499 | 1.426816 |
+| sample2 | 17.949799 | 9.317792 |
+| sample3 |  1.202631 | 4.190287 |
+| sample4 |  8.824977 | 3.868968 |
+| sample5 | 29.619816 | 7.001639 |
 
 ``` r
 tibble_1 <- as_tibble(mat_1, rownames = "sample") # rownames are included as a new variable    
@@ -1129,11 +1129,11 @@ dim(tibble_1)
 
 | sample  |     gene1 |    gene2 |
 | :------ | --------: | -------: |
-| sample1 |  3.282617 | 3.381025 |
-| sample2 | 23.904538 | 7.376351 |
-| sample3 |  6.112106 | 8.891578 |
-| sample4 |  6.729298 | 5.694143 |
-| sample5 | 15.413555 | 7.760555 |
+| sample1 |  6.738499 | 1.426816 |
+| sample2 | 17.949799 | 9.317792 |
+| sample3 |  1.202631 | 4.190287 |
+| sample4 |  8.824977 | 3.868968 |
+| sample5 | 29.619816 | 7.001639 |
 
 ## Subsetting data frames
 

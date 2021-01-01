@@ -20,7 +20,7 @@ p_load(tidyverse)
 
 # Chapter goals     
 
-Understanding the properties and behaviours of vectors helps you to:    
+Understanding the properties and behaviours of **vectors** helps you to:    
 
 + Understand the difference between atomic vectors and lists.  
 + Understand how different object types (i.e. factors, dates, matrixes, data frames) are created from atomic vectors.     
