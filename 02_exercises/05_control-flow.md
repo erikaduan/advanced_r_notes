@@ -1,7 +1,7 @@
 Chapter 5: Control flow
 ================
 Erika Duan
-2021-01-01
+2021-01-04
 
   - [Chapter goals](#chapter-goals)
   - [Choices](#choices)
@@ -12,6 +12,9 @@ Erika Duan
             input](#handling-a-vector-of-logical-values-as-an-input)
       - [Using `switch()` calls](#using-switch-calls)
   - [Loops](#loops)
+      - [Common pitfalls of using `for`
+        loops](#common-pitfalls-of-using-for-loops)
+      - [Alternatives to `for` loops](#alternatives-to-for-loops)
 
 ``` r
 #-----load R libraries-----   
@@ -23,11 +26,10 @@ p_load(tidyverse)
 
 Understanding what **control flow** is helps you to:
 
-  - To understand how to manage code control flow using two different
-    types of tools - choices and loops.  
-  - To understand how `if` statements and `switch()` calls operate in
-    R.  
-  - To understand how `for` loops and `while` loops operate in R.
+  - Understand how to control code flow using two different types of
+    tools - choices and loops.  
+  - Understand how `if` statements and `switch()` calls operate in R.  
+  - Understand how `for` loops and `while` loops operate in R.
 
 # Choices
 
@@ -47,8 +49,8 @@ evaluated.
 In the second form, if the condition is `TRUE`, `true_action` is
 evaluated and if the condition is `FALSE`, `false_action` is evaluated.
 
-In reality, choices are usually compound `ifelse` statements containing
-multiple conditions.
+In reality, choices usually comprise compound `ifelse` statements
+containing multiple conditions.
 
 ``` r
 #-----coding best practice for writing compound if statements-----  
@@ -78,7 +80,7 @@ explanation of `vapply` usage can also be found
 
 Since an `if` statement returns a value, its result can be assigned.
 However, assignment is only recommended if the `if` statement fits on a
-single line, to maintain readability.
+single line for readability.
 
 ``` r
 #-----you can assign the ouput of single line if statements-----  
@@ -90,7 +92,8 @@ if (TRUE) {print(1)}
 if (TRUE) print(1)  
 #> [1] 1 
 
-# {print(1)} and print(1) and 1 return the same output  
+# {print(1)} and print(1) and 1 return the same output 
+# we do not need to use {} if the statement fits on a single line  
 
 x1 <- if (TRUE) print("eval TRUE") else print("eval FALSE")     
 x2 <- if (FALSE) print("eval FALSE") else print("eval TRUE")     
@@ -109,7 +112,7 @@ drop `NULL` inputs, this allows for compact outputs.
 c("id1", NULL, "id3", NULL, "id5")     
 #> [1] "id1" "id3" "id5"              
 
-paste0("Hello ", NULL, "world", NULL, "!")    
+paste0("Hello ", NULL, "world", NULL, "!", NULL)    
 #> [1] "Hello world!"      
 ```
 
@@ -131,8 +134,8 @@ greet_person("Dan", birthday = TRUE)
 
 ### Handling invalid inputs to `if` statements
 
-Since an `if` statement should always evaluate to a single `TRUE` or
-`FALSE` (a single logical type), most other inputs will generate an
+Since a single `if` statement should always evaluate to a single `TRUE`
+or `FALSE` (a single logical type), most other inputs will generate an
 error.
 
 ``` r
@@ -140,25 +143,26 @@ error.
 if (TRUE) print(1)     
 #> [1] 1      
 
-if (1) {print(1)}  
+if (1) print(1) 
 #> [1] 1  
 
-# if (x) {print(1)}
+# if (x) print(1)  
 #> Error: object 'x' not found
 
 x <- 5
-if (x) {print(1)}
+if (x) print(1)
 #> [1] 1  
 
-# if("x") {print(1)}  
+# if("x") print(1)
 #> Error in if ("x") { : argument is not interpretable as logical   
 ```
 
-An exception occurs when a logical vector of length greater than 1 is
-the output. In R, the first element of the logical vector is then used
-alongside a warning message. It is recommmended to prevent this, as you
-might accidentally miss this warning, by setting the environment
-variable `Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_" = "true")`.
+An exception to this occurs when a logical vector of length greater than
+1 is the output. In R, the first element of the logical vector is then
+used alongside a warning message. It is recommmended to suppress this
+behaviour by setting the environment variable
+`Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_" = "true")`, as you might
+accidentally miss this warning.
 
 ``` r
 #-----be careful of length(logical vector) > 1 outputs-----   
@@ -179,11 +183,11 @@ Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_" = "true")
 
 ### Handling a vector of logical values as an input
 
-When your input is a vector of logical values i.e. when you are
-systematically evaluating a conditon on elements within a vector,
-`ifelse()` or `case_when` can be used to handle the input. The function
-`ifelse()` is a vectorised function containing `test`, `yes` and `no`
-vectors which can be recycled to the same length.
+When your input is a vector of logical values i.e. when you would like
+to evaluate a series of elements within a vector, `ifelse()` or
+`case_when` can be used to handle the input. The function `ifelse()` is
+a vectorised function containing `test`, `yes` and `no` vectors which
+can be recycled to the same length.
 
 From R documentation on `iselse(test, yes, no)`:
 
@@ -201,13 +205,15 @@ ifelse(x %% 3 == 0, "divisible", as.character(x))
 # yes vector output and no vector output are both character type    
 ```
 
-**Note:** `ifelse()` usage is only recommended for scenarios when the
-`yes` and `no` vectors are the same type, as it can be hard to predict
-the output type of complex conditions.
+**Note:** The usage of `ifelse()` is only recommended for scenarios
+where `yes` and `no` outputs are the same type, as it can be hard to
+predict the output type of complex conditions.
 
-The function `case_when` uses a special syntax to allow any number of
+The function `case_when()` uses a special syntax to allow any number of
 condition-vector pairs i.e. the function is not limited to just
-outputting `yes` and `no` vectors.
+outputting `yes` and `no` vectors. A consequence is that we need to
+order `case_when()` condition-vector pairs so that the most restricted
+conditions are first evaluated.
 
 ``` r
 #-----case_when() handles a vector of logical values-----  
@@ -217,11 +223,11 @@ case_when(
   y %% 6 == 0 ~ "div by 6",
   y %% 4 == 0 ~ "div by 4", 
   y %% 3 == 0 ~ "div by 3",
-  TRUE ~ as.character(y)
+  TRUE ~ as.character(y) # the remaining elements all evaluated to TRUE    
 )  
 #> [1] "1"        "2"        "div by 3" "div by 4" "5"        "div by 6"   
 
-# case_when() conditions follow a hierarchy where the first TRUE condition is outputted         
+# the first TRUE condition that applies for each element is outputted         
 ```
 
 ## Using `switch()` calls
@@ -321,8 +327,269 @@ character inputs, as numeric inputs have unpredictable failure modes.
 
 ``` r
 #-----exercise 5.2.4.1-----   
+class(ifelse(TRUE, 1, "no")) 
+#> [1] "numeric"  
+
+class(ifelse(FALSE, 1, "no"))
+#> [1] "character"  
+
+ifelse(NA, 1, "no")
+#> [1] NA  
+
+# when ifelse(test = NA, yes, no), NA is returned  
+
+class(ifelse(NA, 1, "no"))
+#> [1] "logical"  
+
+# NA is a special logical type which denotes missingness    
 
 #-----exercise 5.2.4.2-----   
+x <- 1:10
+
+length(x)
+#> [1] 10  
+
+# length(x) can be evaluated and all non-zero outputs are interpreted as TRUE       
+
+if (length(x)) "not empty" else "empty"
+#> [1] "not empty"
+
+y <- numeric()
+
+length(y)
+#> [1] 0
+
+if (length(y)) "not empty" else "empty"
+#> [1] "empty"  
+
+# length(y) can be evaluated and outputs 0 which is interpreted as FALSE       
 ```
 
 # Loops
+
+In R, `for` loops are used to iterate over items in a vector.
+
+The basic form of a `for` loop is:
+
+  - `for (item in vector) perform_action`
+  - For each item in the vector, `perform_action` is called once and the
+    value of `item` is updated.
+
+The operation `for` assigns the `item` to the current environment,
+overwriting any existing variables with the same name.
+
+``` r
+#-----for overrides existing variable names-----  
+i <- 100 
+
+for (i in 1:3) {
+  print(i + 2)
+}
+
+#> [1] 3
+#> [1] 4
+#> [1] 5
+```
+
+There are two ways to terminate a `for` loop early:
+
+  - Using `next` exits the current iteration.  
+  - USing `break` exits the entire `for` loop.
+
+<!-- end list -->
+
+``` r
+#-----using next to exit a for loop-----
+for (i in 1:5) {
+  if (i %% 2 == 0)
+    next
+  print(paste(i, "is not divisible by 2"))
+}
+#> [1] "1 is not divisible by 2"
+#> [1] "3 is not divisible by 2"
+#> [1] "5 is not divisible by 2"
+
+#-----using break to exit the entire loop-----  
+for (i in 1:5) {
+  print(paste(i, "is less than 4"))
+  if (i > 3) 
+    break
+}
+#> [1] "1 is less than 4"
+#> [1] "2 is less than 4"
+#> [1] "3 is less than 4"
+#> [1] "4 is less than 4"  
+
+# when i = 4, the for loop is first actioned and then the vector exits the for loop 
+```
+
+## Common pitfalls of using `for` loops
+
+There are 3 common pitfalls to using `for` loops in R:
+
+  - When generating data, make sure to preallocate the output container
+    using the function `vector()` or your output will be extremely
+    slow.  
+  - Avoid iterating over `1:length(x)` as the `for` loop will fail in
+    unhelpful ways if x has length 0.  
+  - Always call single inputs and assign single outputs using `[[i]]`
+    inside for loops.
+
+<!-- end list -->
+
+``` r
+#-----preallocate output container when generating data-----  
+query <- c(1, 4, 16, 25) 
+
+output <- vector("double", length = length(query)) 
+
+# use vector() to choose atomic vectors or lists as the efficient output type  
+
+for (i in seq_along(query)){
+  output[[i]] <- sqrt(query[[i]])  
+}
+output
+#> [1] 1 2 4 5  
+```
+
+``` r
+#-----avoid using length() as it outputs an error for length(input) is 0-----
+query <- c()
+
+1:length(query)
+#> [1] 1 0
+
+#> output <- vector("double", length = length(query)) 
+#> for (i in length(query)){
+#>   output[[i]] <- sqrt(query[[i]])  
+#> }
+#> Error in sqrt(query[[i]]) : non-numeric argument to mathematical function  
+
+# this happens as 1:length(query) outputs a nonsensical task sequence    
+
+#-----use seq_along() instead of length()-----  
+#> 1:seq_along(query)
+#> Error in 1:seq_along(query) : argument of length 0
+
+output <- vector("double", length = length(query)) 
+for (i in seq_along(query)){
+  output[[i]] <- sqrt(query[[i]])  
+}
+output
+#> numeric(0)  
+```
+
+``` r
+#-----for loops will strip S3 vector attributes-----  
+dates <- as.Date(c("2020-01-01", "2010-01-01"))
+
+for (i in dates) {
+  print(i)
+}
+#> [1] 18262
+#> [1] 14610
+
+# remember to assign single outputs using [[i]] to preserve S3 vector attributes  
+
+for (i in seq_along(dates)) {
+  print(dates[[i]])
+}
+#> [1] "2020-01-01"
+#> [1] "2010-01-01"
+```
+
+**Note:** More examples of writing efficient `for` loops can be found in
+the [chapter on iteration](https://r4ds.had.co.nz/iteration.html) in the
+R for Data Science textbook.
+
+## Alternatives to `for` loops
+
+In R, `for` loops are useful when you already know the set of elements
+that you want to iterate over.
+
+You can use two alternative iterative approaches when you do not know
+the set of elements in advance:
+
+  - `while(condition) perform_action` - this calls `perform_action`
+    while `condition` is `TRUE`.  
+  - `repeat(action)` - this repeats an action forever, until it
+    encounters a `break`.
+
+You can rewrite any `for` loop to use `while` instead. You can rewrite
+any `while` loop to use `repeat` instead. Although the commands `repeat`
+and `while` are more flexible than a `for` loop, it is best practice to
+use the least flexible solution when performing iterations.
+
+**Note:** In general, there should be no need to write your own `for`
+loops as the existing functions `purrr::map()` and `apply()` should be
+sufficient for most problems.
+
+``` r
+#-----rewrite for loop into while loop-----  
+# for loop version  
+x <- c(1:5)  
+output <- vector("numeric", length(x))
+
+for (i in seq_along(x)) {
+output[[i]] <- x[[i]] ^ 2  
+}
+output
+#> [1]  1  4  9 16 25
+
+# while loop version  
+
+x <- c(1:5)  
+i <- 1
+output <- vector("numeric", length(x))
+
+while (i <= length(x)) {
+  output[[i]] = x[[i]] ^ 2  
+  i = i + 1
+}
+output
+#> [1]  1  4  9 16 25      
+```
+
+``` r
+#-----exercise 5.3.3.1-----  
+x <- numeric()
+out <- vector("list", length(x))
+for (i in 1:length(x)) {
+  out[i] <- x[i] ^ 2
+}
+out
+
+x[1] ^ 2
+#> [1] NA     
+
+x[0] ^ 2
+#> numeric(0)     
+
+# output of length(x) is 0  
+# first iteration - x[1] will generate NA 
+# second iteration - x[0] returns numeric(0)
+
+#-----exercise 5.3.3.2-----  
+xs <- c(1, 2, 3)
+for (x in xs) {
+  xs <- c(xs, x * 2)
+}
+xs
+#> [1] 1 2 3 2 4 6
+
+# this should read as an infinite loop as it has the potential to keep growing    
+# to prevent this, the loop appends x * 2 onto the pre-existing vector just once for x = c(1, 2, 3)   
+
+#-----exercise 5.3.3.3-----   
+for (i in 1:3) {
+  i <- i * 2
+  print(i) 
+}  
+#> [1] 2
+#> [1] 4
+#> [1] 6
+
+# this is outputting the value for each original item in the original index      
+# the original index is used for the for loop 
+# reassigning the index does not affect the following iterations  
+```
