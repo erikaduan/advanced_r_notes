@@ -12,7 +12,8 @@ I recommend reading [Advanced R Solutions](https://advanced-r-solutions.rbind.io
 2. [Vectors](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/03_vectors.md)  
 3. [Subsetting](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/04_subsetting.md)  
 4. [Control flow](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/05_control-flow.md)  
-
+5. [Functions](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/06_functions.md)  
+6. [Environments](https://github.com/erikaduan/Advanced-R-notes/blob/master/02_exercises/07_environments.md)  
 # Advanced R Youtube lectures  
 
 [Advanced R video lectures](https://www.youtube.com/playlist?list=PL3x6DOfs2NGhPmtka2Wg_NdLk71LJFbVl)  

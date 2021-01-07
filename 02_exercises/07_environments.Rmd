@@ -1,0 +1,21 @@
+---
+title: "Chapter 7: Environments"  
+author: "Erika Duan"
+date: "`r Sys.Date()`"
+output: 
+  github_document:
+    toc: true
+---  
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = 'hide')
+```
+
+```{r, message = FALSE, warning = FALSE}
+#-----load R libraries-----   
+if (!require(pacman)) install.packages("pacman")
+p_load(tidyverse)  
+```
+
+
+# Chapter goals   
