@@ -36,3 +36,35 @@ Functional programming languages have:
 
 **Note:** Exception to pure functions include `runif()`, `sample()` and `Sys.time()` due to differing output generation, and `write.csv()` and `<-` due to global environment modification, although you can argue that the intention of these functions is always consistent.    
 
+
+# Functional composition  
+
+A functional is a function that:  
++ Takes a function as an input.    
++ Returns a vector as an output.  
+
+```{r, fig.show = 'asis'}
+# examples of simple functionals -----------------------------------------------  
+generate_random <- function(f) f(runif(n = 100, min = 0, max = 10)) 
+
+generate_random(mean)
+#> [1] 4.523039
+
+generate_random(sd)
+#> [1] 2.94176  
+
+generate_random(hist)
+```
+
+```{r}
+# integration is a mathematical functional -------------------------------------  
+```
+
+A common use of functionals is as a more readable, task focused and output focused alternative to for loops.  
+
+```{r}
+# for loop example -------------------------------------------------------------
+
+# functional alternative -------------------------------------------------------
+```
+

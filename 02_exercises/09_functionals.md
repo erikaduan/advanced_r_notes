@@ -6,6 +6,7 @@ Erika Duan
 -   [Chapter goals](#chapter-goals)
 -   [Fundamental concepts of functional
     programming](#fundamental-concepts-of-functional-programming)
+-   [Functional composition](#functional-composition)
 
 ``` r
 # load R libraries -------------------------------------------------------------   
@@ -39,3 +40,28 @@ Functional programming languages have:
 `Sys.time()` due to differing output generation, and `write.csv()` and
 `<-` due to global environment modification, although you can argue that
 the intention of these functions is always consistent.
+
+# Functional composition
+
+A functional is a function that:  
++ Takes a function as an input.  
++ Returns a vector as an output.
+
+``` r
+# examples of simple functionals -----------------------------------------------  
+generate_random <- function(f) f(runif(n = 100, min = 0, max = 10)) 
+
+generate_random(mean)
+#> [1] 4.523039
+
+generate_random(sd)
+#> [1] 2.94176  
+
+generate_random(hist)
+```
+
+![](09_functionals_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+# integration is a mathematical functional --------------------------------------  
+```
